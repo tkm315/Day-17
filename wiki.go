@@ -1,25 +1,20 @@
 package main
 
-//wich one ?
-//fmt.printf or fmt.Fprintf ?
+//http.HandleFunc
 import (
 	"fmt"
-	"os"
+	"log"
+	"net/http"
 )
 
+func goodHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "oh nice to meet you felani %s", r.URL.Path[len("/good/"):])
+}
+func badHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "go out %s", r.URL.Path[len("/bad/"):])
+}
 func main() {
-	myfile, err := os.Create("Fprintf.txt")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer myfile.Close()
-	//look at here
-	fmt.Fprintf(myfile, "this is my %s file", "lovely")
-	readfile, err := os.ReadFile("Fprintf.txt")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(readfile))
+	http.HandleFunc("/good/", goodHandler)
+	http.HandleFunc("/bad/", badHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
