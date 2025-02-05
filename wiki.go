@@ -1,20 +1,34 @@
 package main
 
-//http.HandleFunc
+//localhost/view/myTXTpage
 import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
-func goodHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "oh nice to meet you felani %s", r.URL.Path[len("/good/"):])
+type Page struct {
+	Title string
+	Body  []byte
 }
-func badHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "go out %s", r.URL.Path[len("/bad/"):])
+
+// make filename , read context , return *Page
+func loadPage(title string) (*Page, error) {
+	filename := title + ".txt"
+	body, _ := os.ReadFile(filename)
+	return &Page{Title: title, Body: body}, nil
 }
+
+// extract title , loadPage(title) , display
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/view/"):]
+	p, _ := loadPage(title)
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+}
+
 func main() {
-	http.HandleFunc("/good/", goodHandler)
-	http.HandleFunc("/bad/", badHandler)
+	http.HandleFunc("/view/", viewHandler)
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
