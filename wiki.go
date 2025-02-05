@@ -1,6 +1,6 @@
 package main
 
-//hard coded html edit page
+//pretty coded html edit page
 import (
 	"html/template"
 	"log"
