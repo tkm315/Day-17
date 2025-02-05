@@ -1,8 +1,7 @@
 package main
 
-//handling error
-// line 32 , 33 edited
-// line 69 ... 72 edited
+// template caching
+// line 30 , 37 edited
 import (
 	"html/template"
 	"log"
@@ -28,14 +27,12 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+
+// must is for panic!
 // once parse and exe it every where
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, err := template.ParseFiles(tmpl + ".html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = t.Execute(w, p)
+	err := templates.ExecuteTemplate(w, tmpl+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
